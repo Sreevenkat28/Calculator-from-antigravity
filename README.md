@@ -30,3 +30,14 @@ python3 -m http.server 3000
 # Using Node.js (npx serve)
 npx serve .
 ```
+
+## Streamlit Cloud Deployment
+
+This app is ready to deploy directly to **Streamlit Community Cloud**:
+
+1. Log in to [share.streamlit.io](https://share.streamlit.io/) with your GitHub account.
+2. Click **New app**.
+3. Select your repository: `Sreevenkat28/Calculator-from-antigravity`.
+4. Set Main file path to: `streamlit_app.py`.
+5. Click **Deploy!**
+
