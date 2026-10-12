@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniCalc - Smart Calculator & Graphing Suite</title>
+  <meta name="description" content="A state-of-the-art interactive calculator with automatic live evaluation, Cartesian X-Y graph plotter for linear lines, parabolas, polynomials, and trigonometry.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark" data-view="split">
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- Global Top Bar & View Switcher -->
+  <header class="app-topbar">
+    <div class="brand">
+      <div class="brand-indicator"></div>
+      <span class="brand-name">OmniCalc</span>
+      <span class="auto-badge" id="autoBadge" title="Automatic live calculation and plotting">
+        <span class="pulse-dot"></span> AUTO GRAPH
+      </span>
+    </div>
+
+    <!-- Segmented View Switcher: Calculator | Grapher | Split -->
+    <nav class="view-switcher" role="tablist" aria-label="Application View Mode">
+      <button class="view-tab" data-view="calc" role="tab" id="tab-calc" aria-selected="false">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+          <line x1="8" y1="6" x2="16" y2="6"></line>
+          <line x1="16" y1="14" x2="16" y2="18"></line>
+          <path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"></path>
+        </svg>
+        <span>Calculator</span>
+      </button>
+      <button class="view-tab" data-view="graph" role="tab" id="tab-graph" aria-selected="false">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+          <path d="M3 3v18h18"></path>
+        </svg>
+        <span>Grapher</span>
+      </button>
+      <button class="view-tab active" data-view="split" role="tab" id="tab-split" aria-selected="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <line x1="12" y1="3" x2="12" y2="21"></line>
+        </svg>
+        <span>Split View</span>
+      </button>
+    </nav>
+
+    <!-- Top Utility Icons -->
+    <div class="header-actions">
+      <!-- Scientific Mode Toggle -->
+      <button id="sciToggleBtn" class="mode-toggle-btn" title="Toggle Scientific Functions (F)" aria-label="Toggle Scientific Functions">
+        <span>fx</span>
+      </button>
+      <!-- Theme Switcher -->
+      <button id="themeToggleBtn" class="icon-btn" title="Toggle Theme" aria-label="Toggle Theme">
+        <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+      <!-- Audio Feedback -->
+      <button id="soundToggleBtn" class="icon-btn" title="Toggle Sound Feedback" aria-label="Toggle Audio">
+        <svg class="sound-on-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <svg class="sound-off-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      </button>
+      <!-- History Drawer Toggle with Live Count Badge -->
+      <button id="historyToggleBtn" class="icon-btn history-btn-with-badge" title="Calculation History (H)" aria-label="View History">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span class="history-count-badge" id="historyCountBadge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <div class="workspace-container">
+    <!-- Panel 1: Calculator -->
+    <main class="calculator-card" id="calculatorApp" role="region" aria-label="Interactive Calculator">
+      <!-- Display Section with Real-Time Live Stream -->
+      <section class="display-panel" aria-live="polite">
+        <!-- Angle mode indicator (DEG/RAD) in display -->
+        <div class="display-mode-indicator">
+          <span class="mode-tag" id="angleModeTag">DEG</span>
+        </div>
+
+        <!-- Scrollable Expression / Formula Row -->
+        <div class="expression-container" id="expressionContainer">
+          <span class="expression-text" id="expressionDisplay">0</span>
+        </div>
+
+        <!-- Live Automatic Result Row -->
+        <div class="result-container" id="resultContainer">
+          <span class="result-symbol" id="resultSymbol">=</span>
+          <span class="result-text" id="resultDisplay">0</span>
+        </div>
+
+        <!-- Notification Bar for Messages/Copy -->
+        <div class="calc-toast" id="calcToast" aria-hidden="true"></div>
+      </section>
+
+      <!-- Ultra-Fast Quick History Ribbon (Instant 1-Click Access) -->
+      <section class="quick-history-ribbon" id="quickHistoryRibbon" aria-label="Recent calculations tape">
+        <span class="quick-ribbon-label">Recent:</span>
+        <div class="quick-ribbon-items" id="quickRibbonItems">
+          <span class="quick-ribbon-empty">Calculations appear here instantly</span>
+        </div>
+      </section>
+
+      <!-- Expandable Scientific Functions Grid -->
+      <section class="scientific-panel" id="scientificPanel" aria-label="Scientific Functions">
+        <div class="sci-grid">
+          <button class="key key-sci-mode" id="angleToggleBtn" data-action="toggle-angle" title="Switch DEG / RAD mode">
+            <span id="angleToggleText">DEG</span>
+          </button>
+          <button class="key key-sci" data-action="sin" title="Sine function">sin</button>
+          <button class="key key-sci" data-action="cos" title="Cosine function">cos</button>
+          <button class="key key-sci" data-action="tan" title="Tangent function">tan</button>
+          <button class="key key-sci" data-action="log" title="Logarithm base 10">log</button>
+          <button class="key key-sci" data-action="ln" title="Natural Logarithm (ln)">ln</button>
+
+          <button class="key key-sci" data-action="square" title="Square (x²)">x²</button>
+          <button class="key key-sci" data-action="reciprocal" title="Reciprocal (1/x)">1/x</button>
+          <button class="key key-sci" data-action="abs" title="Absolute Value |x|">|x|</button>
+          <button class="key key-sci" data-action="factorial" title="Factorial (n!)">n!</button>
+          <button class="key key-sci" data-action="constant" data-val="π" title="Pi Constant (3.14159...)">π</button>
+          <button class="key key-sci" data-action="constant" data-val="e" title="Euler's Constant (2.71828...)">e</button>
+        </div>
+      </section>
+
+      <!-- Core Keypad Grid with Variable x Key -->
+      <section class="keypad-grid" role="group" aria-label="Calculator Keypad">
+        <!-- Row 1: Scientific & Utility Functions -->
+        <button class="key key-func" data-action="clear" data-key="Escape" id="key-clear" title="Clear All (Esc)">AC</button>
+        <button class="key key-func" data-action="parentheses" data-key="(" id="key-parentheses" title="Auto Brackets ( )">( )</button>
+        <button class="key key-func" data-action="percent" data-key="%" id="key-percent" title="Percentage (%)">%</button>
+        <button class="key key-ans" data-action="ans" data-key="a" id="key-ans" title="Last Answer (Ans)">Ans</button>
+        <button class="key key-op" data-action="operator" data-val="÷" data-key="/" id="key-divide" title="Divide (/)">÷</button>
+
+        <!-- Row 2 -->
+        <button class="key key-func" data-action="power" data-val="^" data-key="^" id="key-power" title="Exponent (^)">xʸ</button>
+        <button class="key key-num" data-action="number" data-val="7" data-key="7" id="key-7">7</button>
+        <button class="key key-num" data-action="number" data-val="8" data-key="8" id="key-8">8</button>
+        <button class="key key-num" data-action="number" data-val="9" data-key="9" id="key-9">9</button>
+        <button class="key key-op" data-action="operator" data-val="×" data-key="*" id="key-multiply" title="Multiply (*)">×</button>
+
+        <!-- Row 3 -->
+        <button class="key key-func" data-action="sqrt" data-val="√" data-key="s" id="key-sqrt" title="Square Root">√x</button>
+        <button class="key key-num" data-action="number" data-val="4" data-key="4" id="key-4">4</button>
+        <button class="key key-num" data-action="number" data-val="5" data-key="5" id="key-5">5</button>
+        <button class="key key-num" data-action="number" data-val="6" data-key="6" id="key-6">6</button>
+        <button class="key key-op" data-action="operator" data-val="−" data-key="-" id="key-minus" title="Subtract (-)">−</button>
+
+        <!-- Row 4 -->
+        <button class="key key-func" data-action="negate" data-key="±" id="key-negate" title="Negate Sign (±)">±</button>
+        <button class="key key-num" data-action="number" data-val="1" data-key="1" id="key-1">1</button>
+        <button class="key key-num" data-action="number" data-val="2" data-key="2" id="key-2">2</button>
+        <button class="key key-num" data-action="number" data-val="3" data-key="3" id="key-3">3</button>
+        <button class="key key-op" data-action="operator" data-val="+" data-key="+" id="key-plus" title="Add (+)">+</button>
+
+        <!-- Row 5 -->
+        <button class="key key-func" data-action="backspace" data-key="Backspace" id="key-backspace" title="Delete Last Character (Backspace)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+            <line x1="18" y1="9" x2="12" y2="15"></line>
+            <line x1="12" y1="9" x2="18" y2="15"></line>
+          </svg>
+        </button>
+        <button class="key key-var" data-action="variable" data-val="x" data-key="x" id="key-var-x" title="Variable x">x</button>
+        <button class="key key-num" data-action="number" data-val="0" data-key="0" id="key-0">0</button>
+        <button class="key key-num" data-action="decimal" data-val="." data-key="." id="key-decimal">.</button>
+        <button class="key key-equals" data-action="equals" data-key="Enter" id="key-equals" title="Calculate & Commit (Enter)">=</button>
+      </section>
+
+      <!-- Bottom Quick Helper Bar -->
+      <footer class="calc-footer">
+        <span class="keyboard-hint">
+          <kbd>⌨</kbd> Keys: <kbd>F</kbd> Sci &bull; <kbd>x</kbd> Variable &bull; <kbd>H</kbd> History
+        </span>
+        <button class="copy-pill" id="copyResultBtn" title="Copy Current Result">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span>Copy</span>
+        </button>
+      </footer>
+    </main>
+
+    <!-- Panel 2: Interactive Cartesian Graphing Suite -->
+    <section class="graph-card" id="graphApp" role="region" aria-label="Cartesian Graphing Suite">
+      <!-- Graph Top Controls & Function Rack -->
+      <header class="graph-header">
+        <div class="graph-header-left">
+          <div class="graph-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3v18h18"></path>
+              <path d="M7 16l4-8 4 6 5-10"></path>
+            </svg>
+            <h3>X & Y Cartesian Plotter</h3>
+          </div>
+          <span class="graph-subtitle">Pan & scroll to zoom &bull; Hover curve to trace (x, y)</span>
+        </div>
+        <div class="graph-header-actions">
+          <button id="addFunctionBtn" class="pill-btn highlight" title="Add another curve to plot">+ Add Function</button>
+          <button id="resetGraphBtn" class="pill-btn" title="Reset View to (0,0)">⟲ Reset (0,0)</button>
+        </div>
+      </header>
+
+      <!-- Quick Preset Curves Toolbar (Linear, Parabola, Cubic, Sine, etc.) -->
+      <div class="preset-toolbar">
+        <span class="preset-label">Presets:</span>
+        <div class="preset-chips">
+          <button class="preset-chip" data-fn="x^2 - 4" title="Standard Parabola y = x² - 4">🎯 Parabola (x² - 4)</button>
+          <button class="preset-chip" data-fn="2x - 1" title="Linear Line y = 2x - 1">📈 Linear (2x - 1)</button>
+          <button class="preset-chip" data-fn="-0.5x^2 + 5" title="Inverted Parabola y = -0.5x² + 5">⚡ Inverted Parabola</button>
+          <button class="preset-chip" data-fn="sin(x)" title="Trigonometric Sine Wave y = sin(x)">🌊 Sine (sin x)</button>
+          <button class="preset-chip" data-fn="x^3 - 3x" title="Cubic Curve y = x³ - 3x">🌀 Cubic (x³ - 3x)</button>
+          <button class="preset-chip" data-fn="1/x" title="Rational Hyperbola y = 1/x">📐 Inverse (1/x)</button>
+          <button class="preset-chip" data-fn="abs(x)" title="Absolute Value V-shape y = |x|">🏔 Absolute |x|</button>
+          <button class="preset-chip" data-fn="2^x" title="Exponential Growth y = 2^x">🚀 Exponential 2^x</button>
+        </div>
+      </div>
+
+      <!-- Multi-Function Input List -->
+      <div class="functions-list" id="functionsList">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Graph Canvas Container with Dynamic Crosshair & HUD -->
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <canvas id="graphCanvas"></canvas>
+
+        <!-- Floating Coordinates Badge -->
+        <div class="coord-badge" id="coordBadge">
+          <span id="coordBadgeText">x: 0.00, y: 0.00</span>
+        </div>
+
+        <!-- Floating Canvas Tool Controls -->
+        <div class="canvas-controls">
+          <button id="zoomInBtn" class="canvas-ctrl-btn" title="Zoom In (+)">+</button>
+          <button id="zoomOutBtn" class="canvas-ctrl-btn" title="Zoom Out (−)">−</button>
+          <button id="homeViewBtn" class="canvas-ctrl-btn" title="Center Origin">⌂</button>
+        </div>
+
+        <!-- Origin & Axes Reference Indicator -->
+        <div class="axes-indicator" id="axesIndicator">
+          <span>X: <strong id="xRangeText">[-10, 10]</strong></span>
+          <span>Y: <strong id="yRangeText">[-7, 7]</strong></span>
+        </div>
+      </div>
+
+      <!-- Graph Details / Stats Bar -->
+      <div class="graph-stats-bar" id="graphStatsBar">
+        <span class="stat-pill"><span class="dot-active"></span> Plotting active</span>
+        <span class="stat-pill" id="statYIntercept">y-intercept: (0, -4)</span>
+        <span class="stat-pill" id="statVertex">Roots / Vertex auto-traced</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- Super-Charged Calculation History Drawer -->
+  <aside class="history-drawer" id="historyDrawer" aria-label="Calculation History">
+    <div class="history-header">
+      <div class="history-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <h3>Automatic History</h3>
+      </div>
+      <div class="history-ctrls">
+        <button id="exportHistoryBtn" class="pill-btn" title="Export History as Text">Export</button>
+        <button id="clearHistoryBtn" class="pill-btn danger" title="Clear all calculations">Clear</button>
+        <button id="closeHistoryBtn" class="icon-btn" title="Close Drawer (Esc)" aria-label="Close History">✕</button>
+      </div>
+    </div>
+
+    <!-- Instant Fast Search Filter Bar -->
+    <div class="history-search-bar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="historySearchInput" placeholder="Quick search calculations..." autocomplete="off">
+      <button id="clearSearchBtn" class="clear-search-btn" title="Clear search" style="display:none;">✕</button>
+    </div>
+
+    <!-- History List -->
+    <div class="history-list" id="historyList">
+      <!-- Rendered dynamically -->
+    </div>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>
